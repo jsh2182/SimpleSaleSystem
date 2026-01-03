@@ -55,7 +55,7 @@ SimpleSaleSystem/
 ### 🔹 Frontend
 - JavaScript
 - HTML / CSS
-- SPA framework (React/Vue/Angular – depending on implementation)
+- SPA framework (React)
 
 ---
 
@@ -91,10 +91,6 @@ Frontend will open in your default browser and interact with the server.
 
 ## 🔮 Future Improvements
 
-- Authentication system
-- Database integration
-- User and product management
-- API documentation using Swagger
 - Unit and integration testing
 - Improved UI/UX design
 
