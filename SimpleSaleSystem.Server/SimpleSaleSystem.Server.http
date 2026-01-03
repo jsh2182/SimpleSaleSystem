@@ -1,0 +1,6 @@
+@SimpleSaleSystem.Server_HostAddress = http://localhost:5022
+
+GET {{SimpleSaleSystem.Server_HostAddress}}/invoices/
+Accept: application/json
+
+###

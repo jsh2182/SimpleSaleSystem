@@ -1,0 +1,44 @@
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace SimpleSaleSystem.Server.Migrations
+{
+    /// <inheritdoc />
+    public partial class AddProductSerial : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddColumn<string>(
+                name: "ProductSerials",
+                schema: "dbo",
+                table: "Person",
+                type: "nvarchar(1000)",
+                maxLength: 1000,
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "ProductSerials",
+                schema: "dbo",
+                table: "Invoice",
+                type: "nvarchar(1000)",
+                maxLength: 1000,
+                nullable: true);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "ProductSerials",
+                schema: "dbo",
+                table: "Person");
+
+            migrationBuilder.DropColumn(
+                name: "ProductSerials",
+                schema: "dbo",
+                table: "Invoice");
+        }
+    }
+}
