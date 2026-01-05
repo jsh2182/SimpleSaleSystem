@@ -14,6 +14,7 @@
         public virtual ICollection<Person>? CreatedPeople { get; set; }
         public virtual ICollection<Invoice>? Invoices { get; set; }
         public virtual ICollection<Invoice>? Invoices_UpdateBy { get; set; }
+        public virtual ICollection<Invoice>? Invoices_SendToCustomerBy { get; set; }
 
     }
 }

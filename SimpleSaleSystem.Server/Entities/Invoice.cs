@@ -18,6 +18,7 @@ namespace SimpleSaleSystem.Entities
         public bool IsDeleted { get; set; }
         public int CreateByID { get; set; }
         public int? UpdateByID { get; set; }
+        public int? SentToCustomerByID { get; set; }
         public InvoiceTypes InvoiceType { get; set; }
         /// <summary>
         /// 0:Draft, 1:WatingForApprove, 2: Approved
@@ -41,6 +42,7 @@ namespace SimpleSaleSystem.Entities
         public virtual Invoice? ParentInvoice { get; set; }
         public virtual SystemUser? CreatingUser { get; set; }
         public virtual SystemUser? UpdatingUser { get; set; }
+        public virtual SystemUser? SentToCustomerUser { get; set; }
         public virtual Person? Person { get; set; }
         public virtual ICollection<Invoice>? ChildInvoices { get; set; }
         public virtual ICollection<InvoiceDetails>? InvoiceDetails { get; set; }

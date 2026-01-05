@@ -570,3 +570,6 @@ export const  keyIsLetterOrNumber =(char, allowPersian = true, allowSpace = fals
         numberRegex.test(char)
     );
 }
+
+
+

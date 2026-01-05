@@ -1,5 +1,9 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { apiMethods, createBaseQuery, getErrorMessage } from "../../utils/apiHelper";
+import {
+  apiMethods,
+  createBaseQuery,
+  getErrorMessage,
+} from "../../utils/apiHelper";
 import { setSearchFitlers } from "./invoiceSlice";
 
 const BASE_URL = "/api/Invoices";
@@ -18,7 +22,7 @@ export const invoiceApi = createApi({
   //     return headers;
   //   },
   // }),
-  baseQuery:createBaseQuery(BASE_URL),
+  baseQuery: createBaseQuery(BASE_URL),
   endpoints: (builder) => ({
     create: builder.mutation({
       query: (data) => ({
@@ -27,6 +31,7 @@ export const invoiceApi = createApi({
         body: data,
       }),
       transformErrorResponse: (response) => getErrorMessage(response),
+      invalidatesTags: ["invoiceList"],
     }),
     update: builder.mutation({
       query: (data) => ({

@@ -65,6 +65,8 @@ export default function UserList() {
       len: "md:3",
       readOnly: Number(selectedUser?.id) > 0,
       required: "نام کاربری الزامی است",
+      pattern: /^[A-Za-z0-9\s.,!?-]*$/,
+      patternMessage: "تنها حروف انگلیسی مجاز است.",
     },
     {
       name: "IsActive",

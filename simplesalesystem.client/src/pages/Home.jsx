@@ -62,15 +62,16 @@ export default function Home() {
         >
           فاکتور جدید
         </Button>
+
+        {user.uName === "super" && (
+          <>
             <Button
               color="gray"
               icon={FaFileAlt}
               onClick={() => navigate("/invoice/defaultDesc")}
             >
               شرح پیش فرض فاکتور
-            </Button>        
-        {user.uName === "super" && (
-          <>
+            </Button>
             <Button
               color="gray"
               icon={FaUserGear}

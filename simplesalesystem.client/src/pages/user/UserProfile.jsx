@@ -2,13 +2,11 @@ import { useEffect, useState, useEffectEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiModalResultType } from "../../utils/apiHelper";
 import MessageNotifier from "../../components/MessageNotifier";
-import { FaArrowLeft, FaCheck } from "react-icons/fa";
-import { MoonLoader } from "react-spinners";
+import { FaCheck } from "react-icons/fa";
 import SubmitForm from "../../components/form/SubmitForm";
 import Modal from "../../components/Modal";
 import { useUpdateMeMutation } from "../../store/user/userAPI";
 import { useSelector } from "react-redux";
-import { logout } from "../../store/user/userSlice";
 
 export default function UserProfile() {
   const user = useSelector((state) => state.user.currentUser);
@@ -25,6 +23,7 @@ export default function UserProfile() {
       type: "text",
       len: "md:12",
       required: "نام کامل کاربر الزامی است",
+      readOnly: true,
     },
     {
       name: "UserName",
@@ -32,6 +31,8 @@ export default function UserProfile() {
       type: "text",
       len: "md:12",
       required: "نام کاربری الزامی است",
+      pattern:/^[A-Za-z0-9\s.,!?-]*$/,
+      patternMessage:"تنها حروف انگلیسی مجاز است."
     },
     {
       name: "Password",

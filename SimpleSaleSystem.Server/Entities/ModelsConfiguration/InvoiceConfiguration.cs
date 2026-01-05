@@ -24,6 +24,7 @@ namespace SimpleSaleSystem.Entities.ModelsConfiguration
             builder.HasOne(i => i.ParentInvoice).WithMany(i => i.ChildInvoices).HasForeignKey(i => i.ParentInvoiceID);
             builder.HasOne(i => i.CreatingUser).WithMany(u => u.Invoices).HasForeignKey(i => i.CreateByID).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(i => i.UpdatingUser).WithMany(u => u.Invoices_UpdateBy).HasForeignKey(i => i.UpdateByID).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(i => i.SentToCustomerUser).WithMany(u => u.Invoices_SendToCustomerBy).HasForeignKey(i => i.SentToCustomerByID).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(i => i.Person).WithMany(p => p.Invoices).HasForeignKey(i => i.CustomerID);
         }
     }

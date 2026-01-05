@@ -38,7 +38,7 @@ namespace SimpleSaleSystem.Server.Controllers
             {
                 Description = i.Description,
                 ID = i.ID,
-            }).ToArrayAsync(cancellationToken);
+            }).OrderBy(d=>d.Description).ToArrayAsync(cancellationToken);
             return Ok(new { list = result, totalCount = result.Length });
         }
     }

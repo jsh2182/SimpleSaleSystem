@@ -16,29 +16,16 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MdPrint, MdDelete } from "react-icons/md";
 import { IoMdClipboard } from "react-icons/io";
 import { FaPencil } from "react-icons/fa6";
+import { useClipboard } from "../../hooks/useClipboard";
 
 const columns = [
-  //   {
-  //     type: "string",
-  //     name: "barCode",
-  //     order: 1,
-  //     maxLength: 20,
-  //     label: "بار کد فاکتور",
-  //   },
-  //   {
-  //     type: "number",
-  //     name: "invoiceCode",
-  //     order: 2,
-  //     maxLength: 20,
-  //     label: " کد فاکتور",
-  //   },
   {
     type: "string",
     name: "invoiceNumber",
     order: 1,
     maxLength: 20,
     label: "شماره فاکتور",
-    className:"w-[125px]"
+    className: "w-[125px]",
   },
   {
     type: "string",
@@ -47,7 +34,7 @@ const columns = [
     maxLength: 20,
     label: "تاریخ فاکتور",
     showOnMobile: true,
-    className:"w-[120px]"
+    className: "w-[120px]",
   },
   {
     type: "string",
@@ -71,7 +58,7 @@ const columns = [
     order: 4,
     maxLength: 20,
     label: "قابل پرداخت",
-    className:"w-[150px]"
+    className: "w-[150px]",
   },
 
   {
@@ -86,11 +73,12 @@ const columns = [
     name: "pSentToCustomerDate",
     order: 6,
     label: "تاریخ ارسال",
-    className:"w-px"
+    className: "w-px",
   },
 ];
 export default function SearchInvoices() {
   const navigate = useNavigate();
+  const copy = useClipboard();
   const [message, setMessage] = useState(null);
   const tableRef = useRef(null);
   const [
@@ -216,17 +204,17 @@ export default function SearchInvoices() {
       row.customerName +
       "\n" +
       "تماس گیرنده: " +
-      row.callerName +
+      (row.callerName ?? "") +
       "\n" +
       "شماره همراه: " +
-      row.customerMobile +
+      (row.customerMobile ?? "") +
       "\n" +
       "سریال محصولات: " +
-      row.productSerials +
+      (row.productSerials ?? "") +
       "\n" +
       "شرح فاکتور: " +
-      row.description;
-    navigator.clipboard.writeText(copyData);
+      (row.description ?? "");
+    copy(copyData);
   };
   useEffect(() => {
     if (errorDeleteInvoice) {
@@ -277,7 +265,7 @@ export default function SearchInvoices() {
             {
               label: "ارسال",
               icon: <FaPaperPlane size={12} color="blue" className="inline" />,
-              onClick:sendInvoiceToCustomer
+              onClick: sendInvoiceToCustomer,
             },
             {
               label: "کپی",

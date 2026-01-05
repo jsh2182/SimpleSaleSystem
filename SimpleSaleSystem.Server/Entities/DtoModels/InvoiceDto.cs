@@ -47,6 +47,7 @@ namespace SimpleSaleSystem.Entities.DtoModels
         public string CreateByName { get; set; } = "";
         public string PCreationDate=> CreationDate.ToLocalTime().ToPersian();
         public string UpdateByName { get; set; } = "";
+        public string SentToCustomerByName { get; set; } = "";
         public string PUpdatingDate => UpdatingDate > DateTime.MinValue? UpdatingDate.Value.ToLocalTime().ToPersian():"";
     }
 }

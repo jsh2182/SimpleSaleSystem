@@ -33,12 +33,14 @@ import { useLazyGetSettingQuery } from "../../store/systemSetting/settingApi";
 import useIsMobile from "../../hooks/useIsMobile";
 import moment from "moment-jalaali";
 import { BiCalendarCheck, BiCalendarEdit, BiUser } from "react-icons/bi";
+import { useClipboard } from "../../hooks/useClipboard";
 
 export default function Invoice() {
   const { id } = useParams();
   const navigate = useNavigate();
   const tableRef = useRef();
   const isMobile = useIsMobile();
+  const copy = useClipboard();
   const [copyDone, setCopyDone] = useState(false);
   const [
     getNextNumber,
@@ -56,19 +58,13 @@ export default function Invoice() {
       error: loadingPersonError,
     },
   ] = useSearchPerson();
-  const [
-    getProducts,
-    {
-      data: productList = { list: [] },
-      isLoading: loadingProducts,
-      error: productsError,
-    },
-  ] = useGetAllProducts();
+  const [getProducts, { data: productList = { list: [] } }] =
+    useGetAllProducts();
   const [create, { error: createError, isLoading: loadingCreate }] =
     useCreateMutation();
   const [update, { error: updateError, isLoading: loadingUpdate }] =
     useUpdateMutation();
-  const [getInvoice, { error: getError, isLoading: loadingInvoice }] =
+  const [getInvoice, { error: getError, isLoading: loadingInvoice, reset:resetInvoice }] =
     useLazyGetQuery();
   const [getAllDescs, { data: defaultDescList }] =
     useLazyGetAllInvoiceDescsQuery();
@@ -126,6 +122,10 @@ export default function Invoice() {
   });
   const closeModalError = () => {
     setInvoiceMessage(null);
+  };  
+  const onInvoiceClose = () => {
+    resetInvoice();
+    navigate(-1);
   };
   const handleSubmit = async () => {
     if (!invoice?.invoiceDate) {
@@ -147,7 +147,8 @@ export default function Invoice() {
     } else {
       submitData.id = 0;
       const result = await create(submitData).unwrap();
-      navigate(`/invoice/${result.data.id}`);
+      //navigate(`/invoice/${result.data.id}`);
+      onInvoiceClose();
     }
     setInvoiceMessage({
       text: "ثبت/ویرایش اطلاعات فاکتور با موفقیت انجام شد",
@@ -179,9 +180,7 @@ export default function Invoice() {
       setInvoice(result);
     }
   });
-  const onInvoiceClose = () => {
-    navigate(-1);
-  };
+
   const onSetCustomer = async (customerId) => {
     await getProducts();
     const initDetails = productList?.list
@@ -382,10 +381,6 @@ export default function Invoice() {
       productName: prod.productName,
     });
   };
-  const sendInvoiceToCustomer = async () => {
-    const result = await sendToCustomer(id).unwrap();
-    setInvoice({ ...invoice, pSentToCustomerDate: result });
-  };
   const handleCopy = () => {
     const copyData =
       "مشتری: " +
@@ -402,7 +397,7 @@ export default function Invoice() {
       "\n" +
       "شرح فاکتور: " +
       (invoice.description ?? "");
-    navigator.clipboard.writeText(copyData).then(() => {
+    copy(copyData).then(() => {
       setCopyDone(true);
       setTimeout(() => {
         setCopyDone(false);
@@ -417,20 +412,11 @@ export default function Invoice() {
     getSetting();
   });
   useEffect(() => {
-    const error =
-      getNextNumberError ||
-      getError ||
-      updateError ||
-      createError;
+    const error = getNextNumberError || getError || updateError || createError;
     if (error) {
       onError(error);
     }
-  }, [
-    getNextNumberError,
-    getError,
-    createError,
-    updateError,
-  ]);
+  }, [getNextNumberError, getError, createError, updateError]);
 
   useEffect(() => {
     getInvoiceNumber(id);
@@ -454,9 +440,14 @@ export default function Invoice() {
         فاکتور شماره{" "}
         {Number(id) > 0 ? invoice?.invoiceNumber ?? "" : invoiceNumber} &nbsp;
         {invoice?.pSentToCustomerDate && !isMobile && (
-          <span className="text-sm text-blue-500">
-            [تاریخ ارسال برای مشتری: {invoice.pSentToCustomerDate}]
-          </span>
+          <div className="text-xs text-blue-500 inline absolute border-2 border-blue-500 pt-0.5 pb-0.5 pr-2 pl-2 -rotate-10 left-20 top-5">
+            <div>
+              <BiUser className="inline" /> ارسال کننده: {invoice.sentToCustomerByName}
+            </div>
+            <div>
+              <BiCalendarCheck className="inline" /> تاریخ ارسال: {invoice.pSentToCustomerDate}
+            </div>
+          </div>
         )}
       </Modal.Header>
       <Modal.Body className="min-h-[400px]">
@@ -830,29 +821,31 @@ export default function Invoice() {
             disabled={copyDone}
           />
         )}
-        {Number(id) > 0 &&
-        <div className="absolute left-5 bottom-2 text-[9px] text-cyan-900">
-          <div>
-            <BiUser className="inline" /> <span>ثبت کننده: </span>
-            <span>{invoice.createByName}</span>
+        {Number(id) > 0 && (
+          <div className="absolute left-5 bottom-2 text-[9px] text-cyan-900">
+            <div>
+              <BiUser className="inline" /> <span>ثبت کننده: </span>
+              <span>{invoice.createByName}</span>
+            </div>
+            <div>
+              <BiCalendarCheck className="inline" /> <span>تاریخ ثبت: </span>
+              {invoice.pCreationDate}
+            </div>
+            {invoice.updateByName?.length > 0 && (
+              <>
+                <div>
+                  <BiUser className="inline" /> <span>ویرایش کننده: </span>
+                  <span>{invoice.createByName}</span>
+                </div>
+                <div>
+                  <BiCalendarEdit className="inline" />{" "}
+                  <span>تاریخ ویرایش: </span>
+                  {invoice.pUpdatingDate}
+                </div>
+              </>
+            )}
           </div>
-          <div>
-            <BiCalendarCheck className="inline" /> <span>تاریخ ثبت: </span>
-            {invoice.pCreationDate}
-          </div>
-          {invoice.updateByName?.length > 0 && (
-            <>
-              <div>
-                <BiUser className="inline" /> <span>ویرایش کننده: </span>
-                <span>{invoice.createByName}</span>
-              </div>
-              <div>
-                <BiCalendarEdit className="inline" /> <span>تاریخ ویرایش: </span>
-                {invoice.pUpdatingDate}
-              </div>
-            </>
-          )}
-        </div>}
+        )}
       </Modal.Footer>
     </Modal>
   );

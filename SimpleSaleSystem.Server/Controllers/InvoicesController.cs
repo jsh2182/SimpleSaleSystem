@@ -7,6 +7,7 @@ using SimpleSaleSystem.Data;
 using SimpleSaleSystem.Data.Repositories;
 using SimpleSaleSystem.Entities;
 using SimpleSaleSystem.Entities.DtoModels;
+using SimpleSaleSystem.Server.Migrations;
 using System.Security.Principal;
 
 namespace SimpleSaleSystem.Server.Controllers
@@ -181,7 +182,13 @@ namespace SimpleSaleSystem.Server.Controllers
         [HttpGet("[action]")]
         public async Task<ActionResult> Get(long id, CancellationToken cancellationToken)
         {
-            Invoice? invoice = await _invoiceRepo.TableNoTracking.Include(I=>I.CreatingUser).Include(I=>I.UpdatingUser).FirstOrDefaultAsync(i => i.ID == id, cancellationToken).ConfigureAwait(false);
+            Invoice? invoice = await _invoiceRepo.TableNoTracking
+                .Include(I=>I.CreatingUser)
+                .Include(I=>I.UpdatingUser)
+                .Include(i => i.SentToCustomerUser)
+                .Include(i=>i.InvoiceDetails)
+                .ThenInclude(d=>d.Product)
+                .FirstOrDefaultAsync(i => i.ID == id, cancellationToken).ConfigureAwait(false);
             if (invoice == null)
             {
                 return BadRequest("اطلاعات درخواستی در سیستم وجود ندارد.");
@@ -191,13 +198,14 @@ namespace SimpleSaleSystem.Server.Controllers
             _mapper.Map(invoice, result);
             result.CreateByName = invoice.CreatingUser?.UserFullName??"";
             result.UpdateByName = invoice.UpdatingUser?.UserFullName??"";
-            var inv = await _invoiceRepo.TableNoTracking.Include(i=>i.CreatingUser).Include(i=>i.UpdatingUser).Include(i => i.InvoiceDetails)
-                                                        .ThenInclude(d => d.Product)
+            result.SentToCustomerByName = invoice.SentToCustomerUser?.UserFullName ?? "";
+            //var inv = await _invoiceRepo.TableNoTracking.Include(i => i.InvoiceDetails)
+            //                                            .ThenInclude(d => d.Product)
 
-                                                        .Where(i => i.ID == invoice.ID)
-                                                        .FirstOrDefaultAsync(cancellationToken)
-                                                        .ConfigureAwait(false);
-            result.InvoiceDetails = inv?.InvoiceDetails?.Select(d => new InvoiceDetailsDto()
+            //                                            .Where(i => i.ID == invoice.ID)
+            //                                            .FirstOrDefaultAsync(cancellationToken)
+            //                                            .ConfigureAwait(false);
+            result.InvoiceDetails = invoice?.InvoiceDetails?.Select(d => new InvoiceDetailsDto()
             {
                 CountingUnit = d.CountingUnit,
                 Discount = d.Discount,
@@ -357,7 +365,10 @@ namespace SimpleSaleSystem.Server.Controllers
             {
                 return BadRequest("این فاکتور پیش از این برای مشتری ارسال شده است.");
             }
+            var identity = Request.HttpContext.User.Identity;
+            int userId =identity.GetUserId<int>();
             invoice.SentToCustomerDate = DateTime.UtcNow;
+            invoice.SentToCustomerByID = userId;
            await _invoiceRepo.UpdateAsync(invoice, cancellationToken).ConfigureAwait(false);
             var sentDate = invoice.SentToCustomerDate.Value.ToLocalTime();
 
